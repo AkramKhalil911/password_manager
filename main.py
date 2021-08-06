@@ -1,3 +1,4 @@
+import json
 import tkinter
 from tkinter import messagebox
 import random
@@ -25,63 +26,96 @@ def password_gen():
     password_entry.insert(0, password)
     pyperclip.copy(password)
 
+# ---------------------------- SEARCH BY EMAIL ------------------------------- #
+def search_password():
+    website = website_entry.get().title()
+    try:
+        with open("data.json", "r") as file_data:
+            search_data = json.load(file_data)
+            if search_data[website_entry.get().title()]:
+                messagebox.showinfo(website, f"Email: {search_data[website]['email']}\n"
+                                                         f"Password: {search_data[website]['password']}")
+    except FileNotFoundError:
+        messagebox.showerror("File not found!", "The file doesn't exist")
+    except KeyError:
+        messagebox.showerror("Website not found", f"The website {website} doesn't exist")
+
+
 # ---------------------------- SAVE PASSWORD ------------------------------- #
 
 def save_password():
-    save = False
+    new_data = {
+        website_entry.get().title(): {
+            "email": email_entry.get(),
+            "password": password_entry.get()
+        }
+    }
+
     if len(website_entry.get()) == 0 or len(website_entry.get()) == 0 or len(website_entry.get()) == 0:
         messagebox.showerror("Invalid validation", "You need to fill your empty fields!")
     else:
-        save = messagebox.askokcancel(website_entry.get(), f"These are the details entered: "
-                                                    f"\nEmail: {email_entry.get()} "
-                                                    f"\nPassword: {password_entry.get()} "
-                                                    f"\nIs it okay to save?")
+        try:
+            with open("data.json", "r") as data_file:
+                data = json.load(data_file)
+                data.update(new_data)
 
-    if save == True:
-        with open("data.txt", mode="a") as data:
-            data.writelines(f"{website_entry.get()} | {email_entry.get()} | {password_entry.get()}\n")
-        website_entry.delete(0, tkinter.END)
-        email_entry.delete(0, tkinter.END)
-        password_entry.delete(0, tkinter.END)
+            with open("data.json", "w") as data_file:
+                json.dump(data, data_file, indent=4)
+        except FileNotFoundError:
+            with open("data.json", "w") as data_file:
+                json.dump(new_data, data_file, indent=4)
+        except json.decoder.JSONDecodeError:
+            with open("data.json", "w") as data_file:
+                json.dump(new_data, data_file, indent=4)
+        finally:
+            website_entry.delete(0, tkinter.END)
+            email_entry.delete(0, tkinter.END)
+            password_entry.delete(0, tkinter.END)
 
 
 # ---------------------------- UI SETUP ------------------------------- #
 window = tkinter.Tk()
-window.config(padx=50, pady=50)
+window.minsize(520, 400)
+window.config(padx=50, pady=50, bg="#515E63")
 window.title("Password manager")
+window.iconbitmap("logo.ico")
+
 
 # ---------------------------- Row 0 ------------------------------- #
-canvas = tkinter.Canvas(width=200, height=200)
+canvas = tkinter.Canvas(width=200, height=200, bg="#515E63", highlightthickness=0)
 logo_img = tkinter.PhotoImage(file="logo.png")
 canvas.create_image(103, 112, image=logo_img)
 canvas.grid(row=0, column=1)
 
 # ---------------------------- Row 1 ------------------------------- #
-website_label = tkinter.Label(text="Website:")
+website_label = tkinter.Label(text="Website:", bg="#515E63", fg="#C9D8B6", font=("Arial", 12))
 website_label.grid(row=1, column=0)
 
-website_entry = tkinter.Entry(width=35)
-website_entry.grid(row=1, column=1, columnspan=2, sticky="EW")
+website_entry = tkinter.Entry(width=30, bg="#F1ECC3")
+website_entry.grid(row=1, column=1, sticky="W")
+
+search_btn = tkinter.Button(text="Search", width=20, command=search_password, bg="#F1ECC3")
+search_btn.grid(row=1, column=2, sticky="EW")
 
 # ---------------------------- Row 2 ------------------------------- #
-email_label = tkinter.Label(text="Email/Username:")
+email_label = tkinter.Label(text="Email/Username:", bg="#515E63", fg="#C9D8B6", font=("Arial", 12))
 email_label.grid(row=2, column=0)
 
-email_entry = tkinter.Entry(width=35)
+email_entry = tkinter.Entry(width=35, bg="#F1ECC3")
 email_entry.grid(row=2, column=1, columnspan=2, sticky="EW")
 
 # ---------------------------- Row 3 ------------------------------- #
-password_label = tkinter.Label(text="Password:")
+password_label = tkinter.Label(text="Password:", bg="#515E63", fg="#C9D8B6", font=("Arial", 12))
 password_label.grid(row=3, column=0)
 
-password_entry = tkinter.Entry(width=21)
+password_entry = tkinter.Entry(width=30, bg="#F1ECC3")
 password_entry.grid(row=3, column=1, sticky="W")
 
-generate_button = tkinter.Button(text="Generate Password", command=password_gen)
+generate_button = tkinter.Button(text="Generate Password", command=password_gen, bg="#F1ECC3")
 generate_button.grid(row=3, column=2, sticky="EW")
 
 # ---------------------------- Row 4 ------------------------------- #
-submit_button = tkinter.Button(text="Add", width=36, command=save_password)
+submit_button = tkinter.Button(text="Add", width=36, command=save_password, bg="#F1ECC3")
 submit_button.grid(row=4, column=1, columnspan=2, sticky="EW")
 
 window.mainloop()

@@ -1,0 +1,18 @@
+{
+    "Amazon": {
+        "email": "email@email.com",
+        "password": "3$F5zM#5zMYnDM"
+    },
+    "Facebook": {
+        "email": "email@email.com",
+        "password": "(vbLT5#!4SQZx"
+    },
+    "Twitter": {
+        "email": "email@email.com",
+        "password": "$Cca&8poBO4nE"
+    },
+    "Emqol": {
+        "email": "emqol@emqol.com",
+        "password": "p&LAmm*$W44abn"
+    }
+}
